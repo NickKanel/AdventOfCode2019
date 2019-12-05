@@ -19,12 +19,11 @@ def is_valid_password(candidate):
 
     has_continuous_streak = False
     for _, value in chars.items():
-        if len(value) >= 2:
+        if len(value) == 2:
             if value[0] + 1 == value[1]:
                 has_continuous_streak = True
-        # if len(value) > 2:
-        #     if longest_monotonic_streak(value) > 2:
-        #         return False
+        if longest_monotonic_streak(value) == 2:
+            has_continuous_streak = True
 
     if not has_continuous_streak:
         return False
