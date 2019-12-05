@@ -76,6 +76,103 @@ def compute():
         if get_op_code(memory[index]) == 4:
             print_value(memory[index+1])
             index += 2
+        if get_op_code(memory[index]) == 5: # jump if true
+            param0 = get_op_code_param(memory[index], 0)
+            param1 = get_op_code_param(memory[index], 1)
+
+            input0 = None
+            input1 = None
+
+            if param0 == 0:
+                input0 = memory[memory[index+1]]
+            else:
+                input0 = memory[index+1]
+
+            if param1 == 0:
+                input1 = memory[memory[index+2]]
+            else:
+                input1 = memory[index+2]
+
+            if input0 != 0:
+                index = input1
+            else:
+                index += 3
+        if get_op_code(memory[index]) == 6: # jump if false
+            param0 = get_op_code_param(memory[index], 0)
+            param1 = get_op_code_param(memory[index], 1)
+
+            input0 = None
+            input1 = None
+
+            if param0 == 0:
+                input0 = memory[memory[index+1]]
+            else:
+                input0 = memory[index+1]
+
+            if param1 == 0:
+                input1 = memory[memory[index+2]]
+            else:
+                input1 = memory[index+2]
+
+            if input0 == 0:
+                index = input1
+            else:
+                index += 3
+        if get_op_code(memory[index]) == 7: # less than
+            param0 = get_op_code_param(memory[index], 0)
+            param1 = get_op_code_param(memory[index], 1)
+            param2 = get_op_code_param(memory[index], 2)
+
+            input0 = None
+            input1 = None
+            input2 = None
+
+            if param0 == 0:
+                input0 = memory[memory[index+1]]
+            else:
+                input0 = memory[index+1]
+
+            if param1 == 0:
+                input1 = memory[memory[index+2]]
+            else:
+                input1 = memory[index+2]
+
+            if param2 == 0:
+                input2 = memory[index+3]
+            else:
+                print('THIS SHOULD NEVER HAPPEN FOR LT')
+                input2 = memory[index+3]
+
+            less_than(input0, input1, input2)
+            index += 4
+        if get_op_code(memory[index]) == 8: # equal to
+            param0 = get_op_code_param(memory[index], 0)
+            param1 = get_op_code_param(memory[index], 1)
+            param2 = get_op_code_param(memory[index], 2)
+
+            input0 = None
+            input1 = None
+            input2 = None
+
+            if param0 == 0:
+                input0 = memory[memory[index+1]]
+            else:
+                input0 = memory[index+1]
+
+            if param1 == 0:
+                input1 = memory[memory[index+2]]
+            else:
+                input1 = memory[index+2]
+
+            if param2 == 0:
+                input2 = memory[index+3]
+            else:
+                print('THIS SHOULD NEVER HAPPEN FOR EQ')
+                input2 = memory[index+3]
+
+            equal_to(input0, input1, input2)
+            index += 4
+
     # return memory[0]
 
 def left_pad(string, length, pad = '0'):
@@ -98,7 +195,7 @@ def init_memory(codes):
         memory[index] = code
 
 def get_input():
-    return 1
+    return 5
 
 def print_value(pos):
     print(memory[pos])
@@ -111,7 +208,18 @@ def add(input1, input2, pos3):
 
 def multiply(input1, input2, pos3):
     memory[pos3] = input1 * input2
-    
+
+def less_than(input1, input2, pos3):
+    if input1 < input2:
+        memory[pos3] = 1
+    else:
+        memory[pos3] = 0
+
+def equal_to(input1, input2, pos3):
+    if input1 == input2:
+        memory[pos3] = 1
+    else:
+        memory[pos3] = 0
 
 if __name__ == '__main__':
     main()
