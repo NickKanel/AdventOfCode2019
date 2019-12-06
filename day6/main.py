@@ -31,11 +31,12 @@ def main():
             orbiter.orbiting = center
             center.orbiters.add(orbiter)
 
-    summ = 0
-    for key, obj in objects.items():
-        #print(key, obj.name)
-        summ += get_distance_to_com(obj)
-    print(summ)
+    # summ = 0
+    # for key, obj in objects.items():
+    #     #print(key, obj.name)
+    #     summ += get_distance_to_com(obj)
+    # print(summ)
+    print(distance_from_to(objects['YOU'].orbiting, objects['SAN'].orbiting))
 
 def get_distance_to_com(obj):
     # print('checking ' + obj.name)
@@ -43,8 +44,43 @@ def get_distance_to_com(obj):
         return 0
     return 1 + get_distance_to_com(obj.orbiting)
 
-# def distance_from_to(source, dest):
-#     shorte
+def distance_from_to(source, dest):
+    visited = set()
+    distances = dict()
+    for _, obj in objects.items():
+        distances[obj] = 1000000000
+    distances[source] = 0
+
+    current = source
+    while len(visited) < len(objects):
+        visited.add(current)
+        for child in get_nodes(current):
+            if 1 + distances[current] <= distances[child]:
+                distances[child] = 1 + distances[current]
+        
+        next_node = None
+        lowest_score = 1000000000
+        for child in get_nodes(current):
+            if child in visited:
+                continue
+            if distances[child] <= lowest_score:
+                next_node = child
+                lowest_score = distances[child]
+        for obj in visited:
+            for child in get_nodes(obj):
+                if child in visited:
+                    continue
+                if distances[child] <= lowest_score:
+                    next_node = child
+                    lowest_score = distances[child]
+        current = next_node
+
+    return distances[dest]
+
+def get_nodes(obj):
+    if obj.orbiting == None:
+        return list(obj.orbiters)
+    return [obj.orbiting] + list(obj.orbiters)
 
 if __name__ == '__main__':
     main()
