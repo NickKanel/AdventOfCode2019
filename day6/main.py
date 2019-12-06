@@ -27,19 +27,12 @@ def main():
                 orbiter = Object(second)
                 objects[orbiter.name] = orbiter
 
-            # if orbiter.
             orbiter.orbiting = center
             center.orbiters.add(orbiter)
 
-    # summ = 0
-    # for key, obj in objects.items():
-    #     #print(key, obj.name)
-    #     summ += get_distance_to_com(obj)
-    # print(summ)
     print(distance_from_to(objects['YOU'].orbiting, objects['SAN'].orbiting))
 
 def get_distance_to_com(obj):
-    # print('checking ' + obj.name)
     if obj.name == 'COM':
         return 0
     return 1 + get_distance_to_com(obj.orbiting)
