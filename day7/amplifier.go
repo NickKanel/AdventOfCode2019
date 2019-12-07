@@ -67,7 +67,7 @@ func (amp *Amplifier) Compute(wg *sync.WaitGroup) {
             amp.equalTo(input0, input1, dest)
             amp.index += 4
         } else {
-            log.Println("HIT UNKNOWN CODE", opcode)
+            log.Fatal("HIT UNKNOWN CODE", opcode)
         }
     }
     wg.Done()
