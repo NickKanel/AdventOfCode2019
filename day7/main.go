@@ -63,10 +63,10 @@ func main() {
 }
 
 func makePerms(start int, stop int) [][]int {
-    perms := make([][]int, 0)
+    var perms [][]int
 
     stop += 1
-    elements := make([]int, 0)
+    var elements []int
     for i := start; i < stop; i++ {
         elements = append(elements, i)
     }

@@ -10,12 +10,11 @@ func leftPad(s string, l int, c rune) string {
 	}
 
 	sLen := len(s)
-	sRunes := []rune(s)
 	for i := 0; i < (l - sLen); i++ {
-		sRunes = append([]rune{c}, sRunes...)
+		s = string(c) + s
 	}
 
-	return string(sRunes)
+	return s
 }
 
 func getOpCode(code int) int {
