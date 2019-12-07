@@ -31,65 +31,43 @@ func (amp *Amplifier) Compute(wg *sync.WaitGroup) {
     for {
         param0 := getOpCodeParam(amp.memory[amp.index], 0)
         param1 := getOpCodeParam(amp.memory[amp.index], 1)
-        param2 := getOpCodeParam(amp.memory[amp.index], 2)
+
+        input0 := amp.getValueForParam(param0, 1)
+        input1 := amp.getValueForParam(param1, 2)
 
         opcode := getOpCode(amp.memory[amp.index])
         if opcode == 99 {
             break
         } else if opcode == 1 {
-            if param2 == 1 {
-                log.Println("THIS SHOULD NEVER HAPPEN FOR ADD")
-            }
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
-            input2 := amp.memory[amp.index + 3]
-            amp.add(input0, input1, input2)
+            dest := amp.memory[amp.index + 3]
+            amp.add(input0, input1, dest)
             amp.index += 4
         } else if opcode == 2 {
-            if param2 == 1 {
-                log.Println("THIS SHOULD NEVER HAPPEN FOR MULTIPLY")
-            }
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
-            input2 := amp.memory[amp.index + 3]
-            amp.multiply(input0, input1, input2)
+            dest := amp.memory[amp.index + 3]
+            amp.multiply(input0, input1, dest)
             amp.index += 4
         } else if opcode == 3 {
-            input0 := amp.memory[amp.index + 1]
-            amp.read(input0)
+            dest := amp.memory[amp.index + 1]
+            amp.read(dest)
             amp.index += 2
         } else if opcode == 4 {
-            input0 := amp.memory[amp.index + 1]
-            amp.print(input0)
+            addr := amp.memory[amp.index + 1]
+            amp.print(addr)
             amp.index += 2
         } else if opcode == 5 {
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
             amp.jumpTrue(input0, input1)
         } else if opcode == 6 {
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
             amp.jumpFalse(input0, input1)
         } else if opcode == 7 {
-            if param2 == 1 {
-                log.Println("THIS SHOULD NEVER HAPPEN FOR ET")
-            }
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
-            input2 := amp.memory[amp.index + 3]
-            amp.lessThan(input0, input1, input2)
+            dest := amp.memory[amp.index + 3]
+            amp.lessThan(input0, input1, dest)
             amp.index += 4
         } else if opcode == 8 {
-            if param2 == 1 {
-                log.Println("THIS SHOULD NEVER HAPPEN FOR ET")
-            }
-            input0 := amp.getValueForParam(param0, 1)
-            input1 := amp.getValueForParam(param1, 2)
-            input2 := amp.memory[amp.index + 3]
-            amp.equalTo(input0, input1, input2)
+            dest := amp.memory[amp.index + 3]
+            amp.equalTo(input0, input1, dest)
             amp.index += 4
         } else {
-            log.Println("HIT CODE", opcode)
+            log.Println("HIT UNKNOWN CODE", opcode)
         }
     }
     wg.Done()
@@ -152,9 +130,15 @@ func (amp *Amplifier) ReadOutput() int {
 }
 
 func (amp *Amplifier) getValueForParam(param int, paramNum int) int {
+    paramIndex := amp.index + paramNum
     if param == 0 {
-        return amp.memory[amp.memory[amp.index + paramNum]]
+        if paramIndex < len(amp.memory) {
+            if amp.memory[amp.index + paramNum] < len(amp.memory) {
+                return amp.memory[amp.memory[paramIndex]]
+            }
+        }
+        return -1
     } else {
-        return amp.memory[amp.index + paramNum]
+        return amp.memory[paramIndex]
     }
 }
