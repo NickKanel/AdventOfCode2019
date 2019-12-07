@@ -9,6 +9,8 @@ import (
     "log"
 )
 
+var amps []*Amplifier
+
 func check(e error) {
     if e != nil {
         panic(e)
@@ -32,14 +34,17 @@ func main() {
 
     codes := parseCodes(string(fileBytes))
 
+    maxOut := 0
     perms := makePerms(0, 4)
     for _, perm := range perms {
         log.Println(perm)
-        amps := make([]Amplifier, 0)
+        amps = make([]*Amplifier, 0)
         for i := 0; i < 5; i += 1 {
-            amp := NewAmplifier(codes, perm[i])
-            amps = append(amps, amp)
+            amp := NewAmplifier(codes, i, perm[i])
+            amps = append(amps, &amp)
         }
+
+        amps[0].AddInput(0)
 
         var wg sync.WaitGroup
         for _, amp := range amps {
@@ -49,18 +54,24 @@ func main() {
         wg.Wait()
         log.Println("done")
 
-        amp5Out := amps[4].ReadOutput()
+        amp5Out := <- amps[0].stdin
         log.Println(amp5Out)
+
+        if amp5Out > maxOut {
+            maxOut = amp5Out
+        }
     }
+
+    log.Println(maxOut)
 }
 
 func makePerms(start int, stop int) [][]int {
     perms := make([][]int, 0)
 
     stop += 1
-    elements := make([]int, stop-start)
+    elements := make([]int, 0)
     for i := start; i < stop; i++ {
-        elements[i] = i
+        elements = append(elements, i)
     }
 
     p := prmt.New(prmt.IntSlice(elements))
