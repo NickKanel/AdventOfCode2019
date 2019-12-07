@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	// "log"
 )
 
 func leftPad(s string, l int, c rune) string {
@@ -33,16 +32,3 @@ func getOpCodeParam(code int, index int) int {
 	check(err)
 	return intVal
 }
-
-// def left_pad(string, length, pad = '0'):
-//     if len(string) >= length:
-//         return string
-//     return ''.join([pad]*(length-len(string))) + string
-
-// def get_op_code(code):
-//     return int(left_pad(str(code), 2)[-2:])
-
-// def get_op_code_param(code, index):
-//     padded_code = left_pad(str(code), 2 + index + 1)
-//     params = padded_code[:len(padded_code)-2]
-//     return int(params[len(params) - 1 - index])

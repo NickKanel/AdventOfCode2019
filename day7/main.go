@@ -35,9 +35,8 @@ func main() {
     codes := parseCodes(string(fileBytes))
 
     maxOut := 0
-    perms := makePerms(0, 4)
+    perms := makePerms(5, 9)
     for _, perm := range perms {
-        log.Println(perm)
         amps = make([]*Amplifier, 0)
         for i := 0; i < 5; i += 1 {
             amp := NewAmplifier(codes, i, perm[i])
@@ -52,10 +51,8 @@ func main() {
             go amp.Compute(&wg)
         }
         wg.Wait()
-        log.Println("done")
 
         amp5Out := <- amps[0].stdin
-        log.Println(amp5Out)
 
         if amp5Out > maxOut {
             maxOut = amp5Out
