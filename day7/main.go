@@ -1,9 +1,9 @@
 package main
 
 import (
-	"strings"
+    "strings"
     "strconv"
-	"io/ioutil"
+    "io/ioutil"
     prmt "github.com/gitchander/permutation"
     "sync"
     "log"
