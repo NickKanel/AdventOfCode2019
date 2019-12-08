@@ -26,15 +26,15 @@ def main():
 
     print(ones * twos)
 
-    # image = []
-    # for i in range(0, 6):
-    #     row = []
-    #     for j in range(0, 25):
-    #         row.append(get_pixel_color(layers, i, j))
-    #     image.append(row)
+    image = []
+    for i in range(0, 6):
+        row = []
+        for j in range(0, 25):
+            row.append(get_pixel_color(layers, i, j))
+        image.append(row)
 
-    # for row in image:
-    #     print(row)
+    for row in image:
+        print(row)
 
 def get_pixel_color(layers, i, j):
     for k in range(0, 100):
