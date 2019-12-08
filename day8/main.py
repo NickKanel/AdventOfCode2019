@@ -34,7 +34,7 @@ def main():
         image.append(row)
 
     for row in image:
-        print(row)
+        print(''.join(map(lambda x: ' ' if x == 0 else str(x), row)))
 
 def get_pixel_color(layers, i, j):
     for k in range(0, 100):
