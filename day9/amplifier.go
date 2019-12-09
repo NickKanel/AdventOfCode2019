@@ -6,7 +6,7 @@ import (
     "log"
 )
 
-type Amplifier struct {
+type IntcodeComputer struct {
     memory map[int]int
     index  int
     stdout (chan int)
@@ -15,7 +15,7 @@ type Amplifier struct {
     relativeBase int
 }
 
-func NewAmplifier(codes []int, number int) Amplifier {
+func NewIntcodeComputer(codes []int, number int) IntcodeComputer {
     codesCopy := make([]int, len(codes))
     copy(codesCopy, codes)
 
@@ -24,7 +24,7 @@ func NewAmplifier(codes []int, number int) Amplifier {
         memory[i] = j
     }
 
-    amp := Amplifier {
+    amp := IntcodeComputer {
         memory: memory,
         index: 0,
         stdout: make(chan int, 100000),
@@ -35,7 +35,7 @@ func NewAmplifier(codes []int, number int) Amplifier {
     return amp
 }
 
-func (amp *Amplifier) Compute(wg *sync.WaitGroup) {
+func (amp *IntcodeComputer) Compute(wg *sync.WaitGroup) {
     for {
         param1 := getOpCodeParam(amp.memory[amp.index], 0)
         param2 := getOpCodeParam(amp.memory[amp.index], 1)
@@ -77,32 +77,31 @@ func (amp *Amplifier) Compute(wg *sync.WaitGroup) {
             log.Fatal("HIT UNKNOWN CODE", opcode)
         }
     }
-    close(amp.stdout)
     wg.Done()
 }
 
-func (amp *Amplifier) add(addr1 int, addr2 int, addr3 int) {
+func (amp *IntcodeComputer) add(addr1 int, addr2 int, addr3 int) {
     // log.Println("adding", amp.getMemory(addr1), amp.getMemory(addr2), "and putting result into", addr3)
     amp.memory[addr3] = amp.getMemory(addr1) + amp.getMemory(addr2)
 }
 
-func (amp *Amplifier) multiply(addr1 int, addr2 int, addr3 int) {
+func (amp *IntcodeComputer) multiply(addr1 int, addr2 int, addr3 int) {
     // log.Println("multiplying", amp.getMemory(addr1), amp.getMemory(addr2), "and putting result into", addr3)
     amp.memory[addr3] = amp.getMemory(addr1) * amp.getMemory(addr2)
 }
 
-func (amp *Amplifier) print(addr1 int) {
+func (amp *IntcodeComputer) print(addr1 int) {
     // log.Println("output:", amp.getMemory(addr1))
     amp.stdout <- amp.getMemory(addr1)
     // amps[(amp.number + 1) % 5].AddInput(amp.memory[pos])
 }
 
-func (amp *Amplifier) read(addr1 int) {
+func (amp *IntcodeComputer) read(addr1 int) {
     amp.memory[addr1] = <- amp.stdin
     // log.Println("read", amp.getMemory(addr1), "into", addr1)
 }
 
-func (amp *Amplifier) jumpTrue(addr1 int, addr2 int) {
+func (amp *IntcodeComputer) jumpTrue(addr1 int, addr2 int) {
     if amp.getMemory(addr1) != 0 {
         // log.Println("jumping to", amp.getMemory(addr2))
         amp.index = amp.getMemory(addr2)
@@ -112,7 +111,7 @@ func (amp *Amplifier) jumpTrue(addr1 int, addr2 int) {
     }
 }
 
-func (amp *Amplifier) jumpFalse(addr1 int, addr2 int) {
+func (amp *IntcodeComputer) jumpFalse(addr1 int, addr2 int) {
     if amp.getMemory(addr1) == 0 {
         // log.Println("jumping to", amp.getMemory(addr2))
         amp.index = amp.getMemory(addr2)
@@ -122,7 +121,7 @@ func (amp *Amplifier) jumpFalse(addr1 int, addr2 int) {
     }
 }
 
-func (amp *Amplifier) lessThan(addr1 int, addr2 int, addr3 int) {
+func (amp *IntcodeComputer) lessThan(addr1 int, addr2 int, addr3 int) {
     if amp.getMemory(addr1) < amp.getMemory(addr2) {
         amp.memory[addr3] = 1
     } else {
@@ -130,7 +129,7 @@ func (amp *Amplifier) lessThan(addr1 int, addr2 int, addr3 int) {
     }
 }
 
-func (amp *Amplifier) equalTo(addr1 int, addr2 int, addr3 int) {
+func (amp *IntcodeComputer) equalTo(addr1 int, addr2 int, addr3 int) {
     if amp.getMemory(addr1) == amp.getMemory(addr2) {
         amp.memory[addr3] = 1
     } else {
@@ -138,27 +137,27 @@ func (amp *Amplifier) equalTo(addr1 int, addr2 int, addr3 int) {
     }
 }
 
-func (amp *Amplifier) changeRelative(addr1 int) {
+func (amp *IntcodeComputer) changeRelative(addr1 int) {
     amp.relativeBase += amp.getMemory(addr1)
     // log.Println("changed relative to", amp.relativeBase)
 }
 
-func (amp *Amplifier) AddInput(value int) {
+func (amp *IntcodeComputer) AddInput(value int) {
     amp.stdin <- value
 }
 
-func (amp *Amplifier) ReadOutput() int {
+func (amp *IntcodeComputer) ReadOutput() int {
     return <- amp.stdout
 }
 
-func (amp *Amplifier) getMemory(i int) int {
+func (amp *IntcodeComputer) getMemory(i int) int {
     if mapHasKey(amp.memory, i) {
         return amp.memory[i]
     }
     return 0
 }
 
-func (amp *Amplifier) getAddressForParam(param int, paramNum int) int {
+func (amp *IntcodeComputer) getAddressForParam(param int, paramNum int) int {
     paramIndex := amp.index + paramNum
     if param == 0 {
         return amp.getMemory(paramIndex)
