@@ -5,7 +5,7 @@ import (
     "strconv"
     "io/ioutil"
     prmt "github.com/gitchander/permutation"
-    // "sync"
+    "sync"
     "log"
 )
 
@@ -38,10 +38,12 @@ func main() {
     // perms := makePerms(5, 9)
 
 
-    // var wg sync.WaitGroup
+    var wg sync.WaitGroup
+    wg.Add(1)
     amp := NewAmplifier(codes, 0)
-    amp.AddInput(1)
-    amp.Compute()
+    amp.AddInput(2)
+    amp.Compute(&wg)
+    wg.Wait()
     for value := range amp.stdout {
         log.Println(value)
     }
