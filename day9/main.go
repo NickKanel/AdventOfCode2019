@@ -8,8 +8,6 @@ import (
     "log"
 )
 
-var amps []*IntcodeComputer
-
 func check(e error) {
     if e != nil {
         panic(e)
@@ -35,7 +33,7 @@ func main() {
 
     var wg sync.WaitGroup
     wg.Add(1)
-    amp := NewIntcodeComputer(codes, 0)
+    amp := NewIntcodeComputer(codes)
     amp.AddInput(2)
     amp.Compute(&wg)
     close(amp.stdout)

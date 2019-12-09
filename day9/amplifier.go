@@ -15,154 +15,150 @@ type IntcodeComputer struct {
     relativeBase int
 }
 
-func NewIntcodeComputer(codes []int, number int) IntcodeComputer {
-    codesCopy := make([]int, len(codes))
-    copy(codesCopy, codes)
-
+func NewIntcodeComputer(codes []int) IntcodeComputer {
     memory := make(map[int]int)
-    for i, j := range codesCopy {
+    for i, j := range codes {
         memory[i] = j
     }
 
-    amp := IntcodeComputer {
+    comp := IntcodeComputer {
         memory: memory,
         index: 0,
+        relativeBase: 0,
         stdout: make(chan int, 100000),
         stdin: make(chan int, 100000),
-        number: number,
-        relativeBase: 0,
     }
-    return amp
+    return comp
 }
 
-func (amp *IntcodeComputer) Compute(wg *sync.WaitGroup) {
+func (comp *IntcodeComputer) Compute(wg *sync.WaitGroup) {
     for {
-        param1 := getOpCodeParam(amp.memory[amp.index], 0)
-        param2 := getOpCodeParam(amp.memory[amp.index], 1)
-        param3 := getOpCodeParam(amp.memory[amp.index], 2)
+        param1 := getOpCodeParam(comp.memory[comp.index], 0)
+        param2 := getOpCodeParam(comp.memory[comp.index], 1)
+        param3 := getOpCodeParam(comp.memory[comp.index], 2)
 
-        addr1 := amp.getAddressForParam(param1, 1)
-        addr2 := amp.getAddressForParam(param2, 2)
-        addr3 := amp.getAddressForParam(param3, 3)
+        addr1 := comp.getAddressForParam(param1, 1)
+        addr2 := comp.getAddressForParam(param2, 2)
+        addr3 := comp.getAddressForParam(param3, 3)
 
-        opcode := getOpCode(amp.memory[amp.index])
+        opcode := getOpCode(comp.memory[comp.index])
         if opcode == 99 {
             break
         } else if opcode == 1 {
-            amp.add(addr1, addr2, addr3)
-            amp.index += 4
+            comp.add(addr1, addr2, addr3)
+            comp.index += 4
         } else if opcode == 2 {
-            amp.multiply(addr1, addr2, addr3)
-            amp.index += 4
+            comp.multiply(addr1, addr2, addr3)
+            comp.index += 4
         } else if opcode == 3 {
-            amp.read(addr1)
-            amp.index += 2
+            comp.read(addr1)
+            comp.index += 2
         } else if opcode == 4 {
-            amp.print(addr1)
-            amp.index += 2
+            comp.print(addr1)
+            comp.index += 2
         } else if opcode == 5 {
-            amp.jumpTrue(addr1, addr2)
+            comp.jumpTrue(addr1, addr2)
         } else if opcode == 6 {
-            amp.jumpFalse(addr1, addr2)
-        } else if opcode == 7 {
-            amp.lessThan(addr1, addr2, addr3)
-            amp.index += 4
+            comp.jumpFalse(addr1, addr2)
+        } else if opcode == 7 { 
+            comp.lessThan(addr1, addr2, addr3)
+            comp.index += 4
         } else if opcode == 8 {
-            amp.equalTo(addr1, addr2, addr3)
-            amp.index += 4
+            comp.equalTo(addr1, addr2, addr3)
+            comp.index += 4
         } else if opcode == 9 {
-            amp.changeRelative(addr1)
-            amp.index += 2
+            comp.changeRelative(addr1)
+            comp.index += 2
         } else {
-            log.Fatal("HIT UNKNOWN CODE", opcode)
+            log.Fatal("HIT UNKNOWN CODE ", opcode)
         }
     }
     wg.Done()
 }
 
-func (amp *IntcodeComputer) add(addr1 int, addr2 int, addr3 int) {
-    // log.Println("adding", amp.getMemory(addr1), amp.getMemory(addr2), "and putting result into", addr3)
-    amp.memory[addr3] = amp.getMemory(addr1) + amp.getMemory(addr2)
+func (comp *IntcodeComputer) add(addr1 int, addr2 int, addr3 int) {
+    // log.Println("adding", comp.getMemory(addr1), comp.getMemory(addr2), "and putting result into", addr3)
+    comp.memory[addr3] = comp.getMemory(addr1) + comp.getMemory(addr2)
 }
 
-func (amp *IntcodeComputer) multiply(addr1 int, addr2 int, addr3 int) {
-    // log.Println("multiplying", amp.getMemory(addr1), amp.getMemory(addr2), "and putting result into", addr3)
-    amp.memory[addr3] = amp.getMemory(addr1) * amp.getMemory(addr2)
+func (comp *IntcodeComputer) multiply(addr1 int, addr2 int, addr3 int) {
+    // log.Println("multiplying", comp.getMemory(addr1), comp.getMemory(addr2), "and putting result into", addr3)
+    comp.memory[addr3] = comp.getMemory(addr1) * comp.getMemory(addr2)
 }
 
-func (amp *IntcodeComputer) print(addr1 int) {
-    // log.Println("output:", amp.getMemory(addr1))
-    amp.stdout <- amp.getMemory(addr1)
-    // amps[(amp.number + 1) % 5].AddInput(amp.memory[pos])
+func (comp *IntcodeComputer) print(addr1 int) {
+    // log.Println("output:", comp.getMemory(addr1))
+    comp.stdout <- comp.getMemory(addr1)
+    // comps[(comp.number + 1) % 5].AddInput(comp.memory[pos])
 }
 
-func (amp *IntcodeComputer) read(addr1 int) {
-    amp.memory[addr1] = <- amp.stdin
-    // log.Println("read", amp.getMemory(addr1), "into", addr1)
+func (comp *IntcodeComputer) read(addr1 int) {
+    comp.memory[addr1] = <- comp.stdin
+    // log.Println("read", comp.getMemory(addr1), "into", addr1)
 }
 
-func (amp *IntcodeComputer) jumpTrue(addr1 int, addr2 int) {
-    if amp.getMemory(addr1) != 0 {
-        // log.Println("jumping to", amp.getMemory(addr2))
-        amp.index = amp.getMemory(addr2)
+func (comp *IntcodeComputer) jumpTrue(addr1 int, addr2 int) {
+    if comp.getMemory(addr1) != 0 {
+        // log.Println("jumping to", comp.getMemory(addr2))
+        comp.index = comp.getMemory(addr2)
     } else {
-        amp.index += 3
-        // log.Println("not jumping, incremented to", amp.index)
+        comp.index += 3
+        // log.Println("not jumping, incremented to", comp.index)
     }
 }
 
-func (amp *IntcodeComputer) jumpFalse(addr1 int, addr2 int) {
-    if amp.getMemory(addr1) == 0 {
-        // log.Println("jumping to", amp.getMemory(addr2))
-        amp.index = amp.getMemory(addr2)
+func (comp *IntcodeComputer) jumpFalse(addr1 int, addr2 int) {
+    if comp.getMemory(addr1) == 0 {
+        // log.Println("jumping to", comp.getMemory(addr2))
+        comp.index = comp.getMemory(addr2)
     } else {
-        amp.index += 3
-        // log.Println("not jumping, incremented to", amp.index)
+        comp.index += 3
+        // log.Println("not jumping, incremented to", comp.index)
     }
 }
 
-func (amp *IntcodeComputer) lessThan(addr1 int, addr2 int, addr3 int) {
-    if amp.getMemory(addr1) < amp.getMemory(addr2) {
-        amp.memory[addr3] = 1
+func (comp *IntcodeComputer) lessThan(addr1 int, addr2 int, addr3 int) {
+    if comp.getMemory(addr1) < comp.getMemory(addr2) {
+        comp.memory[addr3] = 1
     } else {
-        amp.memory[addr3] = 0
+        comp.memory[addr3] = 0
     }
 }
 
-func (amp *IntcodeComputer) equalTo(addr1 int, addr2 int, addr3 int) {
-    if amp.getMemory(addr1) == amp.getMemory(addr2) {
-        amp.memory[addr3] = 1
+func (comp *IntcodeComputer) equalTo(addr1 int, addr2 int, addr3 int) {
+    if comp.getMemory(addr1) == comp.getMemory(addr2) {
+        comp.memory[addr3] = 1
     } else {
-        amp.memory[addr3] = 0
+        comp.memory[addr3] = 0
     }
 }
 
-func (amp *IntcodeComputer) changeRelative(addr1 int) {
-    amp.relativeBase += amp.getMemory(addr1)
-    // log.Println("changed relative to", amp.relativeBase)
+func (comp *IntcodeComputer) changeRelative(addr1 int) {
+    comp.relativeBase += comp.getMemory(addr1)
+    // log.Println("changed relative to", comp.relativeBase)
 }
 
-func (amp *IntcodeComputer) AddInput(value int) {
-    amp.stdin <- value
+func (comp *IntcodeComputer) AddInput(value int) {
+    comp.stdin <- value
 }
 
-func (amp *IntcodeComputer) ReadOutput() int {
-    return <- amp.stdout
+func (comp *IntcodeComputer) ReadOutput() int {
+    return <- comp.stdout
 }
 
-func (amp *IntcodeComputer) getMemory(i int) int {
-    if mapHasKey(amp.memory, i) {
-        return amp.memory[i]
+func (comp *IntcodeComputer) getMemory(i int) int {
+    if mapHasKey(comp.memory, i) {
+        return comp.memory[i]
     }
     return 0
 }
 
-func (amp *IntcodeComputer) getAddressForParam(param int, paramNum int) int {
-    paramIndex := amp.index + paramNum
+func (comp *IntcodeComputer) getAddressForParam(param int, paramNum int) int {
+    paramIndex := comp.index + paramNum
     if param == 0 {
-        return amp.getMemory(paramIndex)
+        return comp.getMemory(paramIndex)
     } else if param == 2 {
-        return amp.getMemory(paramIndex) + amp.relativeBase
+        return comp.getMemory(paramIndex) + comp.relativeBase
     } else {
         return paramIndex
     }
