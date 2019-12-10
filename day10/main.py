@@ -14,14 +14,22 @@ def main():
                 if c == '#':
                     asteroids.add((i,line_num))
             line_num += 1
-    asteroids.remove(home)
 
-    asteroids = get_visible_points(home, asteroids)
-    asteroids_relative = list(map(lambda x: (x[0] - home[0], x[1] - home[1]), asteroids))
-    asteroids = sort_radially(asteroids_relative)
-    asteroids = list(map(lambda target: (target[0] + home[0], target[1] + home[1]), asteroids))
-    target = asteroids[199]
-    print(target)
+    max_visible = 0
+    for asteroid in asteroids:
+        points = get_visible_points(asteroid, asteroids)
+        if len(points) > max_visible:
+            max_visible = len(points)
+
+    print(max_visible - 1)
+    # asteroids.remove(home)
+
+    # asteroids = get_visible_points(home, asteroids)
+    # asteroids_relative = list(map(lambda x: (x[0] - home[0], x[1] - home[1]), asteroids))
+    # asteroids = sort_radially(asteroids_relative)
+    # asteroids = list(map(lambda target: (target[0] + home[0], target[1] + home[1]), asteroids))
+    # target = asteroids[199]
+    # print(target)
 
 def angle(p2):
     ang1 = np.arctan2(-1, 0)
