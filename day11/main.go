@@ -6,7 +6,7 @@ import (
     "io/ioutil"
     "sync"
     "log"
-    // "fmt"
+    "fmt"
 )
 
 var panels [][]int
@@ -56,7 +56,7 @@ func main() {
     var wg sync.WaitGroup
     wg.Add(1)
     amp := NewIntcodeComputer(codes)
-    amp.AddInput(0)
+    amp.AddInput(1)
     go amp.Compute(&wg)
     first := true
     for value := range amp.stdout {
@@ -67,12 +67,12 @@ func main() {
             setColor(robotPos, value)
             if amp.finished {
                 log.Println("Number of points colored 1 is", len(colored1))
-                // for _, row := range panels {
-                //     for _, col := range row {
-                //         fmt.Print(col)
-                //     }
-                //     fmt.Println()
-                // }
+                for _, row := range panels {
+                    for _, col := range row {
+                        fmt.Print(col)
+                    }
+                    fmt.Println()
+                }
             }
         } else {
             if !amp.finished {
