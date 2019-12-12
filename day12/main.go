@@ -4,7 +4,6 @@ import (
     "log"
     "crypto/md5"
     "fmt"
-    // "math"
 )
 
 type Point struct {
@@ -40,14 +39,82 @@ func getInitialPoints() []Point {
 func main() {
     points := getInitialPoints()
 
-    for i := 0; i < 1000; i++ {
+    initials := make([]Point, 4)
+    copy(initials, points)
+
+    ixs := make([]int, 0)
+    iys := make([]int, 0)
+    izs := make([]int, 0)
+
+    ixs = append(ixs, points[0].x, points[1].x, points[2].x, points[3].x)
+    ixs = append(ixs, points[0].velocity.x, points[1].velocity.x, points[2].velocity.x, points[3].velocity.x)
+    iys = append(iys, points[0].y, points[1].y, points[2].y, points[3].y)
+    iys = append(iys, points[0].velocity.y, points[1].velocity.y, points[2].velocity.y, points[3].velocity.y)
+    izs = append(izs, points[0].z, points[1].z, points[2].z, points[3].z)
+    izs = append(izs, points[0].velocity.z, points[1].velocity.z, points[2].velocity.z, points[3].velocity.z)
+
+    xcycle := 0
+    ycycle := 0
+    zcycle := 0
+
+    count := 1
+    for {
         points = stepTime(points)
+
+        xs := make([]int, 0)
+        ys := make([]int, 0)
+        zs := make([]int, 0)
+
+        xs = append(xs, points[0].x, points[1].x, points[2].x, points[3].x)
+        xs = append(xs, points[0].velocity.x, points[1].velocity.x, points[2].velocity.x, points[3].velocity.x)
+        ys = append(ys, points[0].y, points[1].y, points[2].y, points[3].y)
+        ys = append(ys, points[0].velocity.y, points[1].velocity.y, points[2].velocity.y, points[3].velocity.y)
+        zs = append(zs, points[0].z, points[1].z, points[2].z, points[3].z)
+        zs = append(zs, points[0].velocity.z, points[1].velocity.z, points[2].velocity.z, points[3].velocity.z)
+
+        if xcycle == 0 {
+            if sliceEq(xs, ixs) {
+                xcycle = count
+            }
+        }
+
+        if ycycle == 0 {
+            if sliceEq(ys, iys) {
+                ycycle = count
+            }
+        }
+
+        if zcycle == 0 {
+            if sliceEq(zs, izs) {
+                zcycle = count
+            }
+        }
+
+        if xcycle > 0 && ycycle > 0 && zcycle > 0 {
+            log.Println("Go online to calculate the LCM of these 3:", xcycle, ycycle, zcycle)
+            break
+        }
+
+        count += 1
     }
-    sum := 0
-    for i := 0; i < len(points); i++ {
-        sum += getEnergy(points[i])
+}
+
+func sliceEq(a, b []int) bool {
+    if (a == nil) != (b == nil) { 
+        return false; 
     }
-    log.Println(sum)
+
+    if len(a) != len(b) {
+        return false
+    }
+
+    for i := range a {
+        if a[i] != b[i] {
+            return false
+        }
+    }
+
+    return true
 }
 
 func stepTime(points []Point) []Point {
