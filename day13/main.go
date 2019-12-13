@@ -34,27 +34,57 @@ func main() {
     var wg sync.WaitGroup
     wg.Add(1)
     amp := NewIntcodeComputer(codes)
-    amp.AddInput(1)
+    amp.memory[0] = 2
     go amp.Compute(&wg)
 
     blocks := 0
+    score := 0
+    paddleX := 0
+    ballX := 0
     for {
         if amp.finished {
             break
         }
         
-        _ = <- amp.stdout
-        _ = <- amp.stdout
+        value1 := <- amp.stdout
+        value2 := <- amp.stdout
         value3 := <- amp.stdout
 
         if value3 == 2 {
             blocks += 1
         }
+
+        if value3 == 3 {
+            paddleX = value1
+        }
+
+        if value3 == 4 {
+            ballX = value1
+            if ballX > paddleX {
+                amp.AddInput(1)
+            } else if ballX < paddleX {
+                amp.AddInput(-1)
+            } else {
+                amp.AddInput(0)
+            }
+        }
+
+        if value1 == -1 && value2 == 0 {
+            score = value3
+        }
     }
 
     amp.Shutdown()
 
-    log.Println(blocks)
+    log.Println("Blocks:", blocks)
+    log.Println("Score:", score)
 
     wg.Wait()
+}
+
+func Abs(x int) int {
+    if x < 0 {
+        return -x
+    }
+    return x
 }
